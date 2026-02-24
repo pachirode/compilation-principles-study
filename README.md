@@ -2,6 +2,10 @@
 
 https://crossoverjie.top/2020/03/23/compilation/Lexer/
 
+### 实现 DDL 解析并将其转换为 python 代码
+
+使用 `simple_ddl_parser` 库进行解析
+
 # ANTLR
 
 一个解析器生成器，用于读取处理结构化文本，常用于构建语言，工具和框架

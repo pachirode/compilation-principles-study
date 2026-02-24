@@ -1,6 +1,4 @@
-from dataclasses import dataclass
-
-from .consts import TokenType
+from demo.consts import TokenType
 
 
 class Result:
