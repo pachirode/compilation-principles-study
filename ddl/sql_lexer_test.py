@@ -26,7 +26,7 @@ class SqlLexerTest(unittest.TestCase):
             "  `name` varchar(50, 10) CHARACTER SET utf8mb4 DEFAULT NULL COMMENT '终端机名称',\n"
             "  PRIMARY KEY (`id`)\n"
             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 "
-            "COLLATE=utf8mb4_unicode_ci COMMENT='商家终端机信息表'"
+            "COLLATE=utf8mb4_unicode_ci COMMENT='商家终端机信息表';"
         )
 
         tokenize = lexer.tokenize(sql)
@@ -35,31 +35,10 @@ class SqlLexerTest(unittest.TestCase):
 
     def test_tokenize_3(self):
         lexer = SqlLexer()
-        sql = "PRIMARY KEY (`id`)"
-        tokenize = lexer.tokenize(sql)
+        ddl_file = "demo.sql"
 
-        for result in tokenize:
-            print(f"{result.token_type}\t{str(result)}")
-
-    def test_tokenize_4(self):
-        lexer = SqlLexer()
-        sql = "(`id`)"
-        tokenize = lexer.tokenize(sql)
-
-        for result in tokenize:
-            print(f"{result.token_type}\t{str(result)}")
-
-    def test_tokenize_5(self):
-        lexer = SqlLexer()
-        sql = "`id`"
-        tokenize = lexer.tokenize(sql)
-
-        for result in tokenize:
-            print(f"{result.token_type}\t{str(result)}")
-
-    def test_tokenize_6(self):
-        lexer = SqlLexer()
-        sql = "`name` varchar(50),"
+        with open(ddl_file, "r", encoding="utf-8") as f:
+            sql = f.read()
         tokenize = lexer.tokenize(sql)
 
         for result in tokenize:

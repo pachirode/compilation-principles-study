@@ -11,8 +11,8 @@ class TokenResult:
     def append(self, ch):
         self.text.append(ch)
 
-    def is_varchar(self):
-        return "".join(self.text) == "va"
+    def is_type(self):
+        return "".join(self.text) == "va" or "".join(self.text) == "d" or self.__str__() == 'b' or self.__str__() == 't'
 
     def length(self):
         return len(self.text)
@@ -35,6 +35,14 @@ class SqlLexer:
             if status == DDLTokenType.INIT:
                 result = self.init_token(value, result, sts, add)
                 status = result.token_type
+
+            elif status == DDLTokenType.SQL:
+                if value == ';':
+                    status = DDLTokenType.INIT
+                    result.append(value)
+                    self.tokenize(result.__str__(), Status.BASE_SQL)
+                else:
+                    result.append(value)
 
             elif status == DDLTokenType.CREATE_TABLE:
                 if value == '(':
@@ -66,7 +74,7 @@ class SqlLexer:
             elif status == DDLTokenType.FIELD_TYPE:
                 if (
                         value in ('t', 'l', 'e', 'r')
-                        and not result.is_varchar()
+                        and not result.is_type()
                 ):
                     status = DDLTokenType.INIT
                     result.append(value)
@@ -122,11 +130,15 @@ class SqlLexer:
                 self.results.append(result)
             result = TokenResult()
 
-        if value == 'P' and sts == Status.BASE_INIT:
+        if value and sts == Status.BASE_INIT:
+            result.token_type = DDLTokenType.SQL
+            result.append(value)
+
+        elif value == 'P' and sts == Status.BASE_SQL:
             result.token_type = DDLTokenType.PRIMARY_KEY
             result.append(value)
 
-        elif value == 'C' and sts == Status.BASE_INIT:
+        elif value == 'C' and sts == Status.BASE_SQL:
             result.token_type = DDLTokenType.CREATE_TABLE
             result.append(value)
 
@@ -134,7 +146,7 @@ class SqlLexer:
             result.token_type = DDLTokenType.TABLE_NAME
             result.append(value)
 
-        elif value == '`' and sts == Status.BASE_INIT:
+        elif value == '`' and sts == Status.BASE_SQL:
             result.token_type = DDLTokenType.FIELD
             result.append(value)
 
@@ -146,7 +158,7 @@ class SqlLexer:
             result.token_type = DDLTokenType.PRIMARY_KEY
             result.append(value)
 
-        elif value in ('i', 'd', 'v') and sts == Status.BASE_FIELD:
+        elif value in ('t', 'b', 'i', 'd', 'v') and sts == Status.BASE_FIELD:
             result.token_type = DDLTokenType.FIELD_TYPE
             result.append(value)
 
@@ -158,7 +170,7 @@ class SqlLexer:
             result.token_type = DDLTokenType.COMMENT
             result.append(value)
 
-        elif self.is_letter(value):
+        elif self.is_letter(value) and sts == Status.BASE_SQL:
             result.token_type = DDLTokenType.COMMAND
             result.append(value)
 
